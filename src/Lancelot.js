@@ -3,6 +3,7 @@ import * as utils from "./utils/_index.js";
 import * as math from "./math/_index.js";
 import * as input from "./input/_index.js";
 import * as geometry from "./geometry/_index.js";
+import * as network from "./network/_index.js";
 import { Scene } from "./core/Scene.js";
 import { renderer } from "./graphics/Renderer.js";
 import { canvas } from "./graphics/Canvas.js";
@@ -137,7 +138,8 @@ export const lancelot = (function() {
         utils,
         math,
         input,
-        geometry
+        geometry,
+        network
     }
 
 })();
