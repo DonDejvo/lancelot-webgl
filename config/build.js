@@ -4,5 +4,5 @@ await esbuild.build({
   entryPoints: ["src/Lancelot.js"],
   bundle: true,
   format: "esm",
-  outfile: "dist/lancelot-cdn-module.js",
+  outfile: "dist/lancelot-cdn-module.js"
 });
