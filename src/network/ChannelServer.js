@@ -30,14 +30,26 @@ export class ChannelServer {
             this.createConnection(target);
         }
 
+        signalServer.onLeaveRoom = (target, room) => {
+            if(signalServer.socket.id == target || room != this.serverRoom) {
+                return;
+            }
+            const connection = this.connections.find(connection => connection.socketId == target);
+            if(connection) {
+                connection.localConnection.close();
+            }
+        }
+
         signalServer.onMessage = (from, message) => {
             const connection = this.connections.find(connection => connection.socketId == from);
             if(connection) {
                 connection.handleSignalMessage(message);
             }
         }
+    }
 
-        signalServer.start();
+    connect() {
+        this.signalServer.start();
     }
 
     createConnection(socketId) {

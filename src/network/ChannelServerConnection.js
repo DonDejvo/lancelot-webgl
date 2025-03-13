@@ -5,13 +5,11 @@ export class ChannelServerConnection {
     server;
     localConnection;
     channel;
-    connected;
 
     constructor(socketId, server) {
         this.socketId = socketId;
         this.server = server;
         this.localConnection = new RTCPeerConnection();
-        this.connected = false;
 
         this.localConnection.onicecandidate = (e) => {
             server.signalServer.sendMessage(socketId, {
@@ -25,7 +23,6 @@ export class ChannelServerConnection {
         this.channel.init();
 
         this.channel.onConnect = () => {
-            this.connected = true;
             if(server.onConnect) {
                 server.onConnect(this);
             }
@@ -33,7 +30,6 @@ export class ChannelServerConnection {
 
         this.channel.onDisconnect = () => {
             server.removeConnection(this);
-            this.connected = false;
             if(server.onDisconnect) {
                 server.onDisconnect(this);
             }
@@ -64,5 +60,9 @@ export class ChannelServerConnection {
                 this.localConnection.addIceCandidate(message.candidate);
                 break;
         }
+    }
+
+    get connected() {
+        return this.channel.ready;
     }
 }

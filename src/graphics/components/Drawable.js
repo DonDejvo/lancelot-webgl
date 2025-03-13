@@ -6,7 +6,7 @@ export class Drawable extends Component {
         this._offset = params.offset;
         this._size = params.size;
         this._zIndex = params.zIndex;
-        this._fixed = params.fixed;
+        this._fixed = params.fixed ?? false;
         this._camera = params.camera;
         this._angle = params.angle ?? 0;
     }

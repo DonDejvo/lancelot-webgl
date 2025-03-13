@@ -1,7 +1,10 @@
 import { Vector } from "../math/Vector.js";
+import { Component } from "./Component.js";
 
-export class Transform {
+export class Transform extends Component {
     constructor() {
+        super();
+        
         this._parent = null;
         this._children = new Set();
         this._position = new Vector();

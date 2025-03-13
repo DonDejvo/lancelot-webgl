@@ -3,10 +3,13 @@ import { EntityManager } from "./EntityManager.js";
 import { camera } from "../graphics/components/Camera.js";
 
 export class Scene {
+    _renderer;
+
     constructor() {
         this._started = false;
         this._entityManager = new EntityManager();
         this._pendingEntities = [];
+        this._entitiesToRemove = [];
         this._camera = {};
     }
 
@@ -33,9 +36,10 @@ export class Scene {
     }
 
     removeEntity(e) {
-        this._entityManager.remove(e);
         if(this._started) {
-            e.destroy();
+            this._entitiesToRemove.push(e);
+        } else {
+            this._entityManager.remove(e);
         }
     }
 
@@ -72,6 +76,11 @@ export class Scene {
             this._entityManager.add(e);
             e._scene = this;
             e.start();
+        }
+        while(this._entitiesToRemove.length > 0) {
+            const e = this._entitiesToRemove.pop();
+            e.destroy();
+            this._entityManager.remove(e);
         }
     }
 

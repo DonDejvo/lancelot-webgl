@@ -20,6 +20,7 @@ export class Entity {
         this._scene = null;
         this._transform = new Transform();
         this._handlers = {};
+        this.addComponent("Transform", this._transform);
     }
 
     get name() {
@@ -34,11 +35,11 @@ export class Entity {
         return this._transform;
     }
 
-    addComponent(n, c) {
-        c._entity = this;
-        this._componentsMap.set(n, c);
-        this._components.push(c);
-        return c;
+    addComponent(name, component) {
+        component._entity = this;
+        this._componentsMap.set(name, component);
+        this._components.push(component);
+        return component;
     }
 
     getComponent(n) {

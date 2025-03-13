@@ -1,9 +1,7 @@
-import { ChannelClient } from "./ChannelClient.js";
-import { ChannelServer } from "./ChannelServer.js";
-import { SignalServer } from "./SignalServer.js";
+import { ChannelClientController } from "./ChannelClientController.js"
+import { ChannelServerController } from "./ChannelServerController"
 
 export {
-    SignalServer,
-    ChannelServer,
-    ChannelClient
+    ChannelClientController,
+    ChannelServerController
 }

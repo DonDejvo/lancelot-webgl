@@ -33,7 +33,7 @@ export class SpriteDrawable extends Drawable {
         this._entity._scene.renderer.add(this._renderObject);
     }
     destroy() {
-        this._scene.renderer.remove(this._renderObject);
+        this._entity._scene.renderer.remove(this._renderObject);
     }
     update() {
         if (!this._fixed) {

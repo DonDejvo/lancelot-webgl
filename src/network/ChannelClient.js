@@ -5,25 +5,19 @@ export class ChannelClient {
     signalServer;
     remoteConnection;
     channel;
-    connected;
     onConnect;
     onDisconnect;
     onMessage;
     
-    constructor(serverRoom, signalServer) {
-        this.serverRoom = serverRoom;
+    constructor(signalServer) {
         this.signalServer = signalServer;
         this.channel = new Channel();
-        this.connected = false;
-
-        signalServer.onConnect = () => {
-            signalServer.joinRoom(serverRoom);
-        }
+        this.serverRoom = null;
 
         signalServer.onMessage = (from, message) => {
             switch(message.type) {
                 case "offer":
-                    this.startConnection(from, message.offer);
+                    this.handleOffer(from, message.offer);
                     break;
                 case "candidate":
                     this.remoteConnection.addIceCandidate(message.candidate);
@@ -32,14 +26,12 @@ export class ChannelClient {
         }
 
         this.channel.onConnect = () => {
-            this.connected = true;
             if(this.onConnect) {
                 this.onConnect(this);
             }
         }
 
         this.channel.onDisconnect = () => {
-            this.connected = false;
             if(this.onDisconnect) {
                 this.onDisconnect(this);
             }
@@ -50,11 +42,28 @@ export class ChannelClient {
                 this.onMessage(this, data);
             }
         }
-
-        signalServer.start();
     }
 
-    startConnection(from, offer) {
+    joinRoom(room) {
+        this.serverRoom = room;
+        this.signalServer.joinRoom(room);
+    }
+
+    leaveRoom() {
+        if(this.serverRoom) {
+            this.signalServer.leaveRoom(this.serverRoom);
+            this.serverRoom = null;
+        }
+        if(this.remoteConnection) {
+            this.remoteConnection.close();
+        }
+    }
+
+    connect() {
+        this.signalServer.start();
+    }
+
+    handleOffer(from, offer) {
         const remoteConnection = new RTCPeerConnection();
 
         remoteConnection.onicecandidate = (e) => {
