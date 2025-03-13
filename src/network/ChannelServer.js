@@ -3,15 +3,17 @@ import { ChannelServerConnection } from "./ChannelServerConnection.js";
 export class ChannelServer {
     serverRoom;
     signalServer;
+    rtcConfig;
     connections;
     onStart;
     onConnect;
     onDisconnect;
     onMessage;
 
-    constructor(serverRoom, signalServer) {
+    constructor(serverRoom, signalServer, rtcConfig) {
         this.serverRoom = serverRoom;
         this.signalServer = signalServer;
+        this.rtcConfig = rtcConfig;
 
         this.connections = [];
 

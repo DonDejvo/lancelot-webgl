@@ -12,7 +12,7 @@ export class ChannelClientController extends Component {
 
         this._refreshRate = params.refreshRate ?? 1000 / 30;
 
-        this._channelClient = new ChannelClient(new SignalServer({ host: params.host }));
+        this._channelClient = new ChannelClient(new SignalServer({ host: params.host }), params.rtcConfig);
     }
 
     start() {

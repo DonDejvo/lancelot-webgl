@@ -19,7 +19,7 @@ export class ChannelServerController extends Component {
 
         this._channelServer = new ChannelServer(params.room, new SignalServer({
             host: params.host
-        }));
+        }), params.rtcConfig);
     }
 
     start() {

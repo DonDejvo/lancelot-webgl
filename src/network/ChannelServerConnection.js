@@ -9,7 +9,7 @@ export class ChannelServerConnection {
     constructor(socketId, server) {
         this.socketId = socketId;
         this.server = server;
-        this.localConnection = new RTCPeerConnection();
+        this.localConnection = new RTCPeerConnection(server.rtcConfig);
 
         this.localConnection.onicecandidate = (e) => {
             server.signalServer.sendMessage(socketId, {

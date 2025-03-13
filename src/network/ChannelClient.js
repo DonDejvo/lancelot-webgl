@@ -3,14 +3,16 @@ import { Channel } from "./Channel.js";
 export class ChannelClient {
     serverRoom;
     signalServer;
+    rtcConfig;
     remoteConnection;
     channel;
     onConnect;
     onDisconnect;
     onMessage;
     
-    constructor(signalServer) {
+    constructor(signalServer, rtcConfig) {
         this.signalServer = signalServer;
+        this.rtcConfig = rtcConfig;
         this.channel = new Channel();
         this.serverRoom = null;
 
@@ -64,7 +66,7 @@ export class ChannelClient {
     }
 
     handleOffer(from, offer) {
-        const remoteConnection = new RTCPeerConnection();
+        const remoteConnection = new RTCPeerConnection(this.rtcConfig);
 
         remoteConnection.onicecandidate = (e) => {
             this.signalServer.sendMessage(from, {
