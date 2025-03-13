@@ -18,6 +18,8 @@ export class ChannelServer {
         this.connections = [];
 
         signalServer.onConnect = () => {
+            console.log("Server: Signal server connected with socket [" + signalServer.socket.id + "]");
+            
             signalServer.joinRoom(serverRoom);
 
             if(this.onStart) {
@@ -29,6 +31,8 @@ export class ChannelServer {
             if(signalServer.socket.id == target || room != this.serverRoom) {
                 return;
             }
+            console.log("Server: Socket [" + target + "] joined server room");
+            
             this.createConnection(target);
         }
 
@@ -36,6 +40,7 @@ export class ChannelServer {
             if(signalServer.socket.id == target || room != this.serverRoom) {
                 return;
             }
+            console.log("Server: Socket [" + target + "] left server room");
             const connection = this.connections.find(connection => connection.socketId == target);
             if(connection) {
                 connection.localConnection.close();

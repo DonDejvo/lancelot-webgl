@@ -17,6 +17,7 @@ export class ChannelClient {
         this.serverRoom = null;
 
         signalServer.onMessage = (from, message) => {
+            console.log("Client: Message type " + message.type + " received [" + this.signalServer.socket.id + "]");
             switch(message.type) {
                 case "offer":
                     this.handleOffer(from, message.offer);
@@ -28,12 +29,16 @@ export class ChannelClient {
         }
 
         this.channel.onConnect = () => {
+            console.log("Client: Connected to the channel [" + signalServer.socket.id + "]");
+            
             if(this.onConnect) {
                 this.onConnect(this);
             }
         }
 
         this.channel.onDisconnect = () => {
+            console.log("Client: Disconnected from the channel [" + signalServer.socket.id + "]");
+
             if(this.onDisconnect) {
                 this.onDisconnect(this);
             }

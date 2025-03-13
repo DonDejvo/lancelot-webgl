@@ -28,21 +28,23 @@ export class Channel {
     }
 
     send(data) {
-        this.channel.send(data);
+        if(this.ready) {
+            this.channel.send(data);
+        } else {
+            console.warn("Channel: Trying to send data but channel is not ready");
+        }
     }
 
     handleChannelStateChange() {
         const state = this.channel.readyState;
 
         if(state == "open") {
-            console.log("Client connected");
             this.ready = true;
 
             if(this.onConnect) {
                 this.onConnect();
             }
         } else {
-            console.log("Client disconnected");
             this.ready = false;
 
             if(this.onDisconnect) {

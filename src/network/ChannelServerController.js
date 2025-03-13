@@ -25,7 +25,6 @@ export class ChannelServerController extends Component {
     start() {
         this._channelServer.onStart = () => {
             this._running = true;
-            console.log("Channel server is running");
         }
 
         this._channelServer.onConnect = (connection) => {

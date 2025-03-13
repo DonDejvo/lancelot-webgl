@@ -52,6 +52,7 @@ export class ChannelServerConnection {
     }
 
     handleSignalMessage(message) {
+        console.log("Server: Message type " + message.type + " received [" + this.socketId + "]");
         switch(message.type) {
             case "answer":
                 this.localConnection.setRemoteDescription(message.answer);
