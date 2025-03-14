@@ -81,6 +81,8 @@ export class ChannelClient {
         }
 
         remoteConnection.ondatachannel = (e) => {
+            console.log("Client: ondatachannel");
+
             this.channel.channel = e.channel;
             this.channel.init();
         }

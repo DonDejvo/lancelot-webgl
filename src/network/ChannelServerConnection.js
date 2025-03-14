@@ -13,7 +13,7 @@ export class ChannelServerConnection {
 
         this.localConnection.onicecandidate = (e) => {
             server.signalServer.sendMessage(socketId, {
-                type: "candidte",
+                type: "candidate",
                 candidate: e.candidate
             });
         }

@@ -58,6 +58,6 @@ export class ChannelClientController extends Component {
             return;
         }
         
-        this._channelClient.channel.send(this._entity.getComponent("Serializer").serialize());
+        this._channelClient.channel.send(JSON.stringify(this._entity.getComponent("Serializer").serialize()));
     }
 }
