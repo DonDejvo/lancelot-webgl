@@ -1,55 +1,55 @@
 export class Channel {
-    channel;
-    ready;
+    _channel;
     onConnect;
     onDisconnect;
     onMessage;
 
-    constructor(channel) {
-        this.channel = channel;
-        this.ready = false;
+    constructor() {
+        
     }
 
     init() {
-        this.channel.onmessage = (e) => {
+        this._channel.onmessage = (e) => {
             
             if(this.onMessage) {
                 this.onMessage(e.data);
             }
         }
 
-        this.channel.onopen = () => {
-            this.handleChannelStateChange();
+        this._channel.onopen = () => {
+            this._handleChannelStateChange();
         }
 
-        this.channel.onclose = () => {
-            this.handleChannelStateChange();
+        this._channel.onclose = () => {
+            this._handleChannelStateChange();
         }
+    }
+
+    setChannel(channel) {
+        this._channel = channel;
     }
 
     send(data) {
-        if(this.ready) {
-            this.channel.send(data);
-        } else {
-            console.warn("Channel: Trying to send data but channel is not ready");
-        }
+        this._channel.send(data);
     }
 
-    handleChannelStateChange() {
-        const state = this.channel.readyState;
+    _handleChannelStateChange() {
+        const state = this._channel.readyState;
 
         if(state == "open") {
-            this.ready = true;
 
             if(this.onConnect) {
                 this.onConnect();
             }
         } else {
-            this.ready = false;
 
             if(this.onDisconnect) {
                 this.onDisconnect();
             }
         }
+    }
+
+    get connected() {
+        return this._channel && this._channel.readyState == "open";
     }
 }

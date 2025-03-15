@@ -3,97 +3,87 @@ import { ChannelServer } from "./ChannelServer.js";
 import { SignalServer } from "./SignalServer.js";
 
 export class ChannelServerController extends Component {
-    _running;
-    _refreshRate;
-    _channelServer;
+    _updateRate;
     _interval;
+    _channelServer;
     _entityData;
-    
+
     constructor(params) {
         super();
 
-        this._refreshRate = params.refreshRate ?? 1000 / 30;
-
+        this._updateRate = params.updateRate ?? 1000 / 60;
         this._entityData = [];
-        this._running = false;
 
-        this._channelServer = new ChannelServer(params.room, new SignalServer({
-            host: params.host
-        }), params.rtcConfig);
+        this._channelServer = new ChannelServer(new SignalServer(params.host), params.rtcConfig, params.room);
+
+        this._channelServer.onClientConnect = (connection) => {
+            const entry = {
+                socketId: connection.socketId
+            };
+            this._entityData.push(entry);
+
+            this._channelServer.sendOrderedText(JSON.stringify({
+                type: "join",
+                socketId: connection.socketId
+            }));
+        }
+
+        this._channelServer.onUnorderedMessage = (connection, text) => {
+            const data = JSON.parse(text);
+            const entry = this._entityData.find(entry => entry.socketId == connection.socketId);
+            if(entry) {
+                entry.data = data;
+            }
+        }
+
+        this._channelServer.onOrderedMessage = (connection, text) => {
+            const data = JSON.parse(text);
+            switch(data.type) {
+                case "ping":
+                    connection.sendOrderedText(JSON.stringify({
+                        type: "pong",
+                        timestamp: data.timestamp
+                    }));
+                    break;
+            }
+        }
+
+        this._channelServer.onClientDisconnect = (connection) => {
+            const entry = this._entityData.find(entry => entry.socketId == connection.socketId);
+            if(entry) {
+                this._entityData.splice(this._entityData.indexOf(entry), 1);
+
+                this._channelServer.sendOrderedText(JSON.stringify({
+                    type: "leave",
+                    socketId: connection.socketId
+                }));
+            }
+        }
     }
 
     start() {
-        this._channelServer.onStart = () => {
-            this._running = true;
-        }
-
-        this._channelServer.onConnect = (connection) => {
-            const entityData = { socketId: connection.socketId };
-            this._entityData.push(entityData);
-
-            this._sendTextDataToAll({
-                type: "join",
-                socketId: connection.socketId
-            });
-        }
-
-        this._channelServer.onDisconnect = (connection) => {
-            const entityData = this._entityData.find(item => item.socketId == connection.socketId);
-
-            this._entityData.splice(this._entityData.indexOf(entityData), 1);
-
-            this._sendTextDataToAll({
-                type: "leave",
-                socketId: connection.socketId
-            });
-        }
-
-        this._channelServer.onMessage = (connection, data) => {
-            const entityData = this._entityData.find(item => item.socketId == connection.socketId);
-
-            if(entityData) {
-                entityData.data = JSON.parse(data);
-            }
-            
-        }
-
-        this._channelServer.connect();
-
         this._interval = setInterval(() => {
-            this._updateEntities();
-        }, this._refreshRate);
+            this._sendEntityData();
+        }, this._updateRate);
+
+        this._channelServer.start();
     }
 
     destroy() {
-        this._running = false;
         if(this._interval) {
             clearInterval(this._interval);
         }
+        this._channelServer.stop();
     }
 
-    _updateEntities() {
-        if(!this._running) {
+    _sendEntityData() {
+        if(this._channelServer.state != "ready") {
             return;
         }
 
-        this._sendTextDataToAll({
+        this._channelServer.sendUnorderedText(JSON.stringify({
             type: "data",
             data: this._entityData
-        });
-    }
-
-    _sendTextData(connection, data) {
-        connection.channel.send(JSON.stringify(data));
-    }
-
-    _sendTextDataToAll(data) {
-        for(let connection of this._channelServer.connections) {
-            
-            if(!connection.connected) {
-                continue;
-            }
-
-            this._sendTextData(connection, data);
-        }
+        }));
     }
 }
